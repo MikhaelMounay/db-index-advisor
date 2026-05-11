@@ -122,7 +122,7 @@ AdvisorResult dp_advisor(const AdvisorInput& input) {
         int    cost    = candidates[i - 1].storage_cost;
         double benefit = candidates[i - 1].benefit;
 
-        for (int b = 0; b <= B; b++) {
+        for (int b = 1; b <= B; b++) {
             ops++;
 
             // Option A: do not build index i, carry forward without it.
@@ -160,7 +160,8 @@ AdvisorResult dp_advisor(const AdvisorInput& input) {
         ops++;
 
         // If the value changed from row i-1 to row i, candidate i was taken.
-        if (dp[i][b] != dp[i - 1][b]) {
+        // epsilon difference check to avoid floating-point issues; if they are exactly equal, we assume the candidate was not taken.
+        if (fabs(dp[i][b] - dp[i - 1][b]) > 1e-6) {
             selected.push_back(candidates[i - 1]);
             selected_keys.insert(candidates[i - 1].attr.key());
             // Recover the budget that was available before taking this item.
