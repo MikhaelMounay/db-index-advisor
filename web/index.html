@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Database Index Selection Advisor</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link
+		href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;700&family=Space+Grotesk:wght@400;500;600&display=swap"
+		rel="stylesheet"
+	/>
+	<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+	<div class="ambient"></div>
+	<header class="hero">
+		<div>
+			<p class="eyebrow">Advisor Workspace</p>
+			<h1>Database Index Selection Advisor</h1>
+		</div>
+		<div class="hero-actions">
+			<button id="run-analysis" class="primary" type="button">Run analysis</button>
+			<button id="reset-workload" class="ghost" type="button">Reset workspace</button>
+		</div>
+	</header>
+
+		<main class="layout">
+			<section class="panel builder">
+				<div class="panel-header">
+					<h2>Inputs</h2>
+				</div>
+
+			<div class="card">
+				<div class="card-header">
+					<h3>Examples</h3>
+				</div>
+				<div class="row">
+					<select id="example-select"></select>
+					<button id="load-example" class="secondary" type="button">Load example</button>
+				</div>
+				<p id="example-description" class="muted"></p>
+			</div>
+
+			<div class="card">
+				<div class="card-header">
+					<h3>Schema</h3>
+				</div>
+				<table class="table" id="schema-table">
+					<thead>
+						<tr>
+							<th>Relation</th>
+							<th>Attribute</th>
+							<th>Tuples</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody id="schema-rows"></tbody>
+				</table>
+				<button id="add-schema" class="ghost" type="button">Add attribute</button>
+			</div>
+
+			<div class="card">
+				<div class="card-header">
+					<h3>Workload</h3>
+				</div>
+				<table class="table" id="workload-table">
+					<thead>
+						<tr>
+							<th>Query label</th>
+							<th>Attributes (comma-separated)</th>
+							<th>Frequency</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody id="workload-rows"></tbody>
+				</table>
+				<button id="add-workload" class="ghost" type="button">Add query</button>
+			</div>
+
+			<div class="card">
+				<div class="card-header">
+					<h3>Budget</h3>
+				</div>
+				<div class="row">
+					<input id="budget-input" type="number" min="0" value="20" />
+					<span class="muted">units</span>
+				</div>
+			</div>
+
+			<div class="card">
+				<div class="card-header">
+					<h3>Request JSON</h3>
+				</div>
+				<pre id="request-preview" class="code-block"></pre>
+			</div>
+		</section>
+
+		<section class="panel results">
+			<div class="panel-header">
+				<h2>Results</h2>
+				<p id="status-line" class="muted"></p>
+			</div>
+
+			<div class="grid two">
+				<div class="card">
+					<h3>Greedy summary</h3>
+					<ul id="greedy-summary" class="summary"></ul>
+				</div>
+				<div class="card">
+					<h3>DP summary</h3>
+					<ul id="dp-summary" class="summary"></ul>
+				</div>
+			</div>
+
+			<div class="grid two">
+				<div class="card">
+					<h3>Cost comparison</h3>
+					<div class="chart-frame"><canvas id="chart-cost"></canvas></div>
+				</div>
+				<div class="card">
+					<h3>Runtime and ops</h3>
+					<div class="chart-frame"><canvas id="chart-runtime"></canvas></div>
+				</div>
+			</div>
+
+			<div class="grid two">
+				<div class="card">
+					<h3>Budget usage</h3>
+					<div class="chart-frame"><canvas id="chart-budget"></canvas></div>
+				</div>
+				<div class="card">
+					<h3>Top candidate benefits</h3>
+					<div class="chart-frame"><canvas id="chart-candidates"></canvas></div>
+				</div>
+			</div>
+
+			<div class="card">
+				<h3>Selected indexes</h3>
+				<div class="grid two" id="selected-lists">
+					<div>
+						<h4>Greedy</h4>
+						<ul id="greedy-selected" class="list"></ul>
+					</div>
+					<div>
+						<h4>DP</h4>
+						<ul id="dp-selected" class="list"></ul>
+					</div>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+	<script src="app.js"></script>
+</body>
+</html>
