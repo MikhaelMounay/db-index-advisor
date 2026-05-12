@@ -117,6 +117,10 @@ button:hover {
 	gap: 18px;
 }
 
+.panel.scaling {
+	margin-top: 24px;
+}
+
 .panel-header h2 {
 	font-size: 24px;
 	margin-bottom: 6px;
@@ -204,6 +208,12 @@ input {
 	gap: 18px;
 }
 
+.grid.three {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	gap: 18px;
+}
+
 .summary {
 	list-style: none;
 	display: grid;
@@ -239,6 +249,35 @@ input {
 .chart-frame canvas {
 	width: 100% !important;
 	height: 100% !important;
+}
+
+.fixed-note {
+	margin-top: 8px;
+	color: var(--muted);
+	font-size: 12px;
+	letter-spacing: 0.02em;
+}
+
+.complexity-note {
+	margin-top: 14px;
+	text-align: center;
+	color: var(--muted);
+	font-size: 14px;
+}
+
+.complexity-note p {
+	margin: 6px 0;
+}
+
+.complexity-note .label {
+	display: inline-block;
+	min-width: 80px;
+	font-weight: 600;
+	color: var(--accent-3);
+}
+
+.complexity-note .formula {
+	font-weight: 600;
 }
 
 @keyframes fade-in {

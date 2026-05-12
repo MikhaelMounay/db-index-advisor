@@ -15,11 +15,17 @@ const greedySummary = document.getElementById("greedy-summary");
 const dpSummary = document.getElementById("dp-summary");
 const greedySelected = document.getElementById("greedy-selected");
 const dpSelected = document.getElementById("dp-selected");
+const scaleNFixed = document.getElementById("scale-n-fixed");
+const scaleQFixed = document.getElementById("scale-q-fixed");
+const scaleBFixed = document.getElementById("scale-b-fixed");
 
 let chartCost;
 let chartRuntime;
 let chartBudget;
 let chartCandidates;
+let chartScaleN;
+let chartScaleQ;
+let chartScaleB;
 let examplesCache = [];
 
 Chart.defaults.font.family = "Space Grotesk, sans-serif";
@@ -136,6 +142,7 @@ function buildPayload() {
 function updatePreview() {
 	const payload = buildPayload();
 	requestPreview.textContent = JSON.stringify(payload, null, 2);
+	updateScalingCharts(payload);
 }
 
 function setStatus(message) {
@@ -190,11 +197,17 @@ function initCharts() {
 	const runtimeCtx = document.getElementById("chart-runtime");
 	const budgetCtx = document.getElementById("chart-budget");
 	const candidatesCtx = document.getElementById("chart-candidates");
+	const scaleNCtx = document.getElementById("chart-scale-n");
+	const scaleQCtx = document.getElementById("chart-scale-q");
+	const scaleBCtx = document.getElementById("chart-scale-b");
 
 	if (chartCost) chartCost.destroy();
 	if (chartRuntime) chartRuntime.destroy();
 	if (chartBudget) chartBudget.destroy();
 	if (chartCandidates) chartCandidates.destroy();
+	if (chartScaleN) chartScaleN.destroy();
+	if (chartScaleQ) chartScaleQ.destroy();
+	if (chartScaleB) chartScaleB.destroy();
 
 	chartCost = new Chart(costCtx, {
 		type: "bar",
@@ -259,6 +272,35 @@ function initCharts() {
 			},
 			plugins: { legend: { position: "bottom" } },
 		},
+	});
+
+	const lineOptions = {
+		responsive: true,
+		maintainAspectRatio: false,
+		scales: {
+			y: { beginAtZero: true, grid: { color: "rgba(27, 58, 75, 0.08)" } },
+			x: { grid: { display: false } },
+		},
+		plugins: { legend: { position: "bottom" } },
+		elements: { line: { tension: 0.2 } },
+	};
+
+	chartScaleN = new Chart(scaleNCtx, {
+		type: "line",
+		data: { labels: [], datasets: [] },
+		options: lineOptions,
+	});
+
+	chartScaleQ = new Chart(scaleQCtx, {
+		type: "line",
+		data: { labels: [], datasets: [] },
+		options: lineOptions,
+	});
+
+	chartScaleB = new Chart(scaleBCtx, {
+		type: "line",
+		data: { labels: [], datasets: [] },
+		options: lineOptions,
 	});
 }
 
@@ -329,6 +371,104 @@ function updateCharts(result) {
 		},
 	];
 	chartCandidates.update();
+}
+
+function greedyComplexity(n, q) {
+	if (n <= 0) return 0;
+	return n * q + n * Math.log2(n);
+}
+
+function dpComplexity(n, q, b) {
+	return n * q + n * b;
+}
+
+function buildRange(minValue, maxValue, steps) {
+	if (steps <= 1) return [minValue];
+	const range = [];
+	const step = (maxValue - minValue) / (steps - 1);
+	for (let i = 0; i < steps; i++) {
+		range.push(Math.round(minValue + step * i));
+	}
+	return range;
+}
+
+function updateScalingCharts(payload) {
+	if (!chartScaleN || !chartScaleQ || !chartScaleB) return;
+
+	const nBase = Math.max(payload.schema.length || 1, 1);
+	const qBase = Math.max(payload.workload.length || 1, 1);
+	const bBase = Math.max(payload.budget || 1, 1);
+
+	const nRange = buildRange(5, 5000, 10);
+	const qRange = buildRange(5, 5000, 10);
+	const bRange = buildRange(5, 5000, 10);
+
+	chartScaleN.data.labels = nRange.map((value) => value.toString());
+	chartScaleN.data.datasets = [
+		{
+			label: "Greedy",
+			data: nRange.map((n) => greedyComplexity(n, qBase)),
+			borderColor: "#c56b3f",
+			backgroundColor: "rgba(197, 107, 63, 0.15)",
+			fill: true,
+		},
+		{
+			label: "DP",
+			data: nRange.map((n) => dpComplexity(n, qBase, bBase)),
+			borderColor: "#1c7c74",
+			backgroundColor: "rgba(28, 124, 116, 0.15)",
+			fill: true,
+		},
+	];
+	chartScaleN.update();
+
+	chartScaleQ.data.labels = qRange.map((value) => value.toString());
+	chartScaleQ.data.datasets = [
+		{
+			label: "Greedy",
+			data: qRange.map((q) => greedyComplexity(nBase, q)),
+			borderColor: "#c56b3f",
+			backgroundColor: "rgba(197, 107, 63, 0.15)",
+			fill: true,
+		},
+		{
+			label: "DP",
+			data: qRange.map((q) => dpComplexity(nBase, q, bBase)),
+			borderColor: "#1c7c74",
+			backgroundColor: "rgba(28, 124, 116, 0.15)",
+			fill: true,
+		},
+	];
+	chartScaleQ.update();
+
+	chartScaleB.data.labels = bRange.map((value) => value.toString());
+	chartScaleB.data.datasets = [
+		{
+			label: "Greedy",
+			data: bRange.map((b) => greedyComplexity(nBase, qBase)),
+			borderColor: "#c56b3f",
+			backgroundColor: "rgba(197, 107, 63, 0.15)",
+			fill: true,
+		},
+		{
+			label: "DP",
+			data: bRange.map((b) => dpComplexity(nBase, qBase, b)),
+			borderColor: "#1c7c74",
+			backgroundColor: "rgba(28, 124, 116, 0.15)",
+			fill: true,
+		},
+	];
+	chartScaleB.update();
+
+	if (scaleNFixed) {
+		scaleNFixed.textContent = `Fixed: q=${qBase}, B=${bBase}`;
+	}
+	if (scaleQFixed) {
+		scaleQFixed.textContent = `Fixed: n=${nBase}, B=${bBase}`;
+	}
+	if (scaleBFixed) {
+		scaleBFixed.textContent = `Fixed: n=${nBase}, q=${qBase}`;
+	}
 }
 
 function clearResults() {

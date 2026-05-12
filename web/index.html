@@ -148,8 +148,36 @@
 					</div>
 				</div>
 			</div>
+
 		</section>
 	</main>
+
+	<section class="panel scaling">
+		<div class="card">
+			<h3>Scaling curves</h3>
+			<div class="grid three">
+				<div>
+					<h4>Operations vs n</h4>
+					<div class="chart-frame"><canvas id="chart-scale-n"></canvas></div>
+					<p class="fixed-note" id="scale-n-fixed"></p>
+				</div>
+				<div>
+					<h4>Operations vs q</h4>
+					<div class="chart-frame"><canvas id="chart-scale-q"></canvas></div>
+					<p class="fixed-note" id="scale-q-fixed"></p>
+				</div>
+				<div>
+					<h4>Operations vs B</h4>
+					<div class="chart-frame"><canvas id="chart-scale-b"></canvas></div>
+					<p class="fixed-note" id="scale-b-fixed"></p>
+				</div>
+			</div>
+			<div class="complexity-note">
+				<p><span class="label">Greedy</span><span class="formula">Time O(nq + n log n), Space O(n)</span></p>
+				<p><span class="label">DP</span><span class="formula">Time O(nq + nB), Space O(nB)</span></p>
+			</div>
+		</div>
+	</section>
 
 	<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 	<script src="app.js"></script>
